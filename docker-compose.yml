@@ -1,0 +1,18 @@
+services:
+  claudecodeui:
+    image: ${IMAGE:-cloudcli-sandbox:claude-code}
+    container_name: ${CONTAINER_NAME}
+    network_mode: host
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      VITE_PORT: ${VITE_PORT}
+    volumes:
+      - .:/app
+      - ${WORKSPACE_VOLUME}:/home/agent/workspace
+    entrypoint: >
+      sh -c "sudo mkdir -p /home/agent/workspace
+      && sudo chown -R agent:agent /home/agent/.claude /home/agent/workspace
+      && npm install
+      && npm run dev"
