@@ -2,17 +2,43 @@ services:
   claudecodeui:
     image: ${IMAGE:-cloudcli-sandbox:claude-code}
     container_name: ${CONTAINER_NAME}
-    network_mode: host
     restart: unless-stopped
     working_dir: /app
+    network_mode: host
     environment:
       SERVER_PORT: ${SERVER_PORT}
       VITE_PORT: ${VITE_PORT}
     volumes:
       - .:/app
       - ${WORKSPACE_VOLUME}:/home/agent/workspace
+      - ${DB_VOLUME}:/home/agent/.cloudcli
+      - ${CLAUDE_VOLUME}:/home/agent/.claude
     entrypoint: >
-      sh -c "sudo mkdir -p /home/agent/workspace
-      && sudo chown -R agent:agent /home/agent/.claude /home/agent/workspace
+      sh -c "sudo mkdir -p /home/agent/workspace /home/agent/.cloudcli
+      && sudo chown -R agent:agent /home/agent/.claude /home/agent/workspace /home/agent/.cloudcli
       && npm install
       && npm run dev"
+
+  # # WITH PORT MAPPING
+  # claudecodeui:
+  #   image: ${IMAGE:-cloudcli-sandbox:claude-code}
+  #   container_name: ${CONTAINER_NAME}
+  #   restart: unless-stopped
+  #   working_dir: /app
+  #   environment:
+  #     SERVER_PORT: 3000
+  #     VITE_PORT: 5173
+  #   volumes:
+  #     - .:/app
+  #     - ${WORKSPACE_VOLUME}:/home/agent/workspace
+  #     - ${DB_VOLUME}:/home/agent/.cloudcli
+  #     - ${CLAUDE_VOLUME}:/home/agent/.claude
+  #   ports:
+  #     - "${SERVER_PORT}:3000"
+  #     - "${VITE_PORT}:5173"
+  #     - "9400-9500:9400-9500"
+  #   entrypoint: >
+  #     sh -c "sudo mkdir -p /home/agent/workspace /home/agent/.cloudcli
+  #     && sudo chown -R agent:agent /home/agent/.claude /home/agent/workspace /home/agent/.cloudcli
+  #     && npm install
+  #     && npm run dev"
